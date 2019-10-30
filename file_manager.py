@@ -1,7 +1,7 @@
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GdkPixbuf
-import os
+import os, time
 
 
 class MainWindow(Gtk.Window):
@@ -53,9 +53,12 @@ class MainWindow(Gtk.Window):
 
         updated_list = []
         for item in file_list:
-        	updated_list.append([item, 0, "0001-01-01"])
+            size = os.path.getsize(item)
+            datec = time.ctime(os.path.getctime(item))
+            datem = time.ctime(os.path.getmtime(item))
+            updated_list.append([item, size, datec, datem])
 
-        file_store = Gtk.ListStore(str, int, str)
+        file_store = Gtk.ListStore(str, int, str, str)
         for file_row in updated_list:
             file_store.append(file_row)
         model = file_store.filter_new()
@@ -63,7 +66,7 @@ class MainWindow(Gtk.Window):
 #        renderer = Gtk.CellRendererText()
 #        column = Gtk.TreeViewColumn("file", Gtk.CellRendererText(), text=0)
 
-        column_names = ["file name", "size", "last change date"]
+        column_names = ["file name", "size", "created", "last changed"]
         for i, col_n in enumerate(column_names):
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(col_n, Gtk.CellRendererText(), text=i)
