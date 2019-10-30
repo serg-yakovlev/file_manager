@@ -61,6 +61,8 @@ class MainWindow(Gtk.Window):
                 dir_list.append([item, "folder"])
             else:
                 not_dir.append([item, "file"])
+        dir_list.sort()
+        not_dir.sort()
         new_file_list = dir_list + not_dir
 
 
