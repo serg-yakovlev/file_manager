@@ -10,7 +10,7 @@ class MainWindow(Gtk.Window):
         super().__init__(title="File manager")
         self.connection = None
         self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_size_request(800, 600)
+        self.set_size_request(1000, 600)
         master_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(master_box)
 
@@ -18,7 +18,7 @@ class MainWindow(Gtk.Window):
         master_box.pack_start(button_box, False, False, 0)
 
         hpaned = Gtk.Paned()
-        hpaned.set_position(250)
+        hpaned.set_position(600)
         master_box.add(hpaned)
         
         left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -30,14 +30,17 @@ class MainWindow(Gtk.Window):
         print("right box:   ", right_box)
         right_box.set_size_request(250, -1)
         hpaned.add2(right_box)
-        label = Gtk.Label(label='...and Right side is here (not to forget)')
+        label = Gtk.Label(label="...and Right side is here (don't confuse)")
         right_box.pack_start(label, False, True, 20)
 
         def butt_click(args):
-        	box, text = args
-        	print(box, text)
-        	label = Gtk.Label(label=text)
-        	box.pack_start(label, False, True, 0)
+            box, text = args
+            print(box, text)
+            label = Gtk.Label(label=text)
+            label = Gtk.Label(label="111")
+            right_box.pack_start(label, False, True, 0)
+            print(master_box)
+            master_box.pack_start(label, False, True, 0)
 
         buttons=[]
         for i in range(5):
@@ -51,14 +54,24 @@ class MainWindow(Gtk.Window):
         #label.set_line_wrap(True)
         #left_box.pack_start(label, False, True, 0)
 
-        updated_list = []
+        dir_list = []
+        not_dir = []
         for item in file_list:
-            size = os.path.getsize(item)
-            datec = time.ctime(os.path.getctime(item))
-            datem = time.ctime(os.path.getmtime(item))
-            updated_list.append([item, size, datec, datem])
+            if os.path.isdir(item):
+                dir_list.append([item, "folder"])
+            else:
+                not_dir.append([item, "file"])
+        new_file_list = dir_list + not_dir
 
-        file_store = Gtk.ListStore(str, int, str, str)
+
+        updated_list = []
+        for item in new_file_list:
+            size = os.path.getsize(item[0])
+            datec = time.ctime(os.path.getctime(item[0]))
+            datem = time.ctime(os.path.getmtime(item[0]))
+            updated_list.append([item[0], item[1], size, datec, datem])
+
+        file_store = Gtk.ListStore(str, str, int, str, str)
         for file_row in updated_list:
             file_store.append(file_row)
         model = file_store.filter_new()
@@ -66,7 +79,7 @@ class MainWindow(Gtk.Window):
 #        renderer = Gtk.CellRendererText()
 #        column = Gtk.TreeViewColumn("file", Gtk.CellRendererText(), text=0)
 
-        column_names = ["file name", "size", "created", "last changed"]
+        column_names = ["file name", "type", "size", "created", "last changed"]
         for i, col_n in enumerate(column_names):
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(col_n, Gtk.CellRendererText(), text=i)
